@@ -50,45 +50,24 @@ mean = mean(train(:,:));
 %Variance across N observations
 var = var(train(:,:));
 
-for i=1:93
-    x(i) = length(find(indx(:,2)==i));
-end
-max(x)
-
 %Median across N observations
 median = median(train(:,:));
+
+%Correlation
+[r,p] = corrcoef(train); % Compute sample correlation and p-values.
+[i,j] = find(p>0.05);
+R = [i,j];
+
+for i=1:93
+    x(i) = length(find(R(:,2)==i));
+end
+max(x)
 
 
 %% Pre-processing
 
 var_idx = find(var>23);
 train_red = train(:,var_idx);
-
-
-	
-%% Downloaded Toolbox
-%the data
-data.X = train;
-[n,d]=size(data.X);
-
-%data normalization
-data = clust_normalize(data,'range');
-figure;
-plot(data.X(:,1),data.X(:,2),'.')
-hold on
-
-%parameters given
-param.c=9;
-param.vis=1;
-param.val=1;
-
-%result=Kmeans(data,param);
-result=Kmeans(data,param);
-hold on
-plot(result.cluster.v(:,1),result.cluster.v(:,2),'ro')
-
-result = validity(result,data,param);
-result.validity
 
 %% MATLAB Toolbox
 
@@ -100,21 +79,14 @@ plot(X(:,1),X(:,2),'.');
 [idx,C] = kmeans(X,9,'Display','final','Replicates',5);
 
 figure;
-colors={'r.' 'b.' 'g.' 'y.' 'm.' 'c.' 'r.' 'b*' 'g*' };
+colors={'r.' 'b.' 'g.' 'y.' 'm.' 'c.' 'r*' 'b*' 'g*' };
 for i=1:9
     hold all
-    plot(X(idx==i,1),X(idx==i,2),colors{i},'MarkerSize',12)
+    plot(X(idx==i,1),X(idx==i,2),colors{i},'MarkerSize',10)
 end
-plot(C(:,1),C(:,2),'kx','MarkerSize',15,'LineWidth',3)
+plot(C(:,1),C(:,2),'kx','MarkerSize',12,'LineWidth',3)
 title 'Cluster Assignments and Centroids'
 hold off
-
-%figure;
-%[silh3,h] = silhouette(X,idx,'cityblock');
-%h = gca;
-%h.Children.EdgeColor = [.8 .8 1];
-%xlabel 'Silhouette Value';
-%ylabel 'Cluster';
 
 figure;
 histogram(idx)
