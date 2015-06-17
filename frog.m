@@ -7,6 +7,9 @@ test = table{:,2:94}; %table2array
 
 %% Statistics
 
+[n,d]=size(test);
+
+
 %Class Ranges (needed because of how data was imported)
 C1 = 1:1929;
 C2 = 1930:18051;
@@ -39,7 +42,7 @@ title('Class-Data Points Distribution')
 grid
 
 %Prior Probabilities
-prob = hist(label,[1 2 3 4 5 6 7 8 9])./N;
+prob = hist(label,[1 2 3 4 5 6 7 8 9])./n;
 
 %Mean across N observations
 mean = mean(train(:,:));
@@ -47,16 +50,26 @@ mean = mean(train(:,:));
 %Variance across N observations
 var = var(train(:,:));
 
+for i=1:93
+    x(i) = length(find(indx(:,2)==i));
+end
+max(x)
+
 %Median across N observations
 median = median(train(:,:));
 
+
+%% Pre-processing
+
+var_idx = find(var>23);
+train_red = train(:,var_idx);
 
 
 	
 %% Downloaded Toolbox
 %the data
 data.X = train;
-[N,n]=size(data.X);
+[n,d]=size(data.X);
 
 %data normalization
 data = clust_normalize(data,'range');
@@ -79,12 +92,12 @@ result.validity
 
 %% MATLAB Toolbox
 
-X=train;
+X=train_red;
 
 figure;
 plot(X(:,1),X(:,2),'.');
 
-[idx,C] = kmeans(X,9,'Distance','cityblock','Display','final','Replicates',5);
+[idx,C] = kmeans(X,9,'Display','final','Replicates',5);
 
 figure;
 colors={'r.' 'b.' 'g.' 'y.' 'm.' 'c.' 'r.' 'b*' 'g*' };
@@ -112,5 +125,7 @@ ylabel('Frequency')
 
 X=train;
 W = getAdjacencyMatrix(X);
+
+%[C, L, U] = SpectralClustering(W, 9, 2);
 
 

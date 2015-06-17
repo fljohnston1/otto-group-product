@@ -9,18 +9,18 @@ function result=Kmeans(data,param)
 data=clust_normalize(data,'range');
 
 X=data.X;
-[N,n]=size(X);
+[n,d]=size(X);
 
 %initialization
 if max(size(param.c))==1,
     c = param.c;
-    index=randperm(N);
+    index=randperm(n);
     v=X(index(1:c),:);v = v + 1e-10;
     v0=X(index(1:c)+1,:);v0 = v0 - 1e-10;
 else
     v = param.c;    
     c = size(param.c,1);
-    index=randperm(N);
+    index=randperm(n);
     v0=X(index(1:c)+1,:);v0 = v0 + 1e-10;
 end   
 iter = 0;
@@ -29,7 +29,7 @@ while prod(max(abs(v - v0))),
     v0 = v;
         %Calculating the distances
          for i = 1:c
-            dist(:,i) = sum([(X - repmat(v(i,:),N,1)).^2],2);
+            dist(:,i) = sum([(X - repmat(v(i,:),n,1)).^2],2);
         end
         %Assigning clusters
            [m,label] = min(dist');
@@ -41,7 +41,7 @@ while prod(max(abs(v - v0))),
          if ~isempty(index)  
              v(i,:) = mean(X(index,:));
          else 
-             ind=round(rand*N-1);
+             ind=round(rand*n-1);
              v(i,:)=X(ind,:);
          end   
          f0(index,i)=1;
@@ -71,7 +71,7 @@ end
 result.cluster.v = v;
 result.data.d = distout;
    %calculate the partition matrix      
-f0=zeros(N,c);
+f0=zeros(n,c);
 for i=1:c
   index=find(label == i);
   f0(index,i)=1;
