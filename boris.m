@@ -1,6 +1,9 @@
-table = readtable('train.csv','Delimiter',',');
-train = table{:,2:94}; %table2array
-label = double(categorical(table.target));
+table_train = readtable('train.csv','Delimiter',',');
+train = table_train{:,2:94}; %table2array
+label = double(categorical(table_train.target));
+
+table_test = readtable('test.csv','Delimiter',',');
+test = table_test{:,2:94}; %table2array
 
 %%
 
@@ -52,6 +55,19 @@ title('Kernel-PCA with Gaussian Kernel')
 saveTightFigure('pca-gauss.pdf');
 
 %%
+figure
+us = unique(train(:));
+cs = histc(train(:), us);
+
+xs = 0:max(us);
+ys = zeros(1, length(xs));
+ys(us + 1) = cs;
+
+plot(log1p(xs), log1p(ys));
+title('Empirical Probability Mass Over All Features')
+xlabel('log1p(x)');
+ylabel('log1p(count(train == x))');
+saveTightFigure('prob-mass-all-features.pdf');
 
 %%
 nfigs = 0;
@@ -78,3 +94,13 @@ end
 
 %%
 
+means = zeros(1, 9);
+vars = zeros(1, 9);
+for i = 1:9
+    test_stat = sum(train(label == i, :) > 0, 2);
+    means(i) = mean(test_stat);
+    vars(i) = var(test_stat);
+end
+figure
+subplot(
+bar(means)
